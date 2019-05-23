@@ -34,7 +34,8 @@
         //  - Como parámetro `callbackError` envía una función que llame al método `showError` enviando un mensaje de
         //    error
         //  - La llamada debe ser asíncrona.
-
+        const API_URL = "https://task-backend-fpuna.herokuapp.com/";
+        Ajax.sendPostRequest(API_URL, param, MediaFormat.JSON,"loadTasks","No se ha podido recuperar la lista de tareas.",true);
     };
 
     /**
