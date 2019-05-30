@@ -34,8 +34,8 @@
         //  - Como parámetro `callbackError` envía una función que llame al método `showError` enviando un mensaje de
         //    error
         //  - La llamada debe ser asíncrona.
-        const API_URL = "https://task-backend-fpuna.herokuapp.com/";
-        Ajax.sendPostRequest(API_URL, param, MediaFormat.JSON,"loadTasks","No se ha podido recuperar la lista de tareas.",true);
+
+        Ajax.sendGetRequest(API_URL, null, MediaFormat.JSON, (value) => loadTasks(value), (code) => showError(code, 'Error al consultar datos'), true);
     };
 
     /**
@@ -88,7 +88,9 @@
         //  - La llamada debe ser asíncrona.
         //  - No te olvides de envíar el parámetro `task` para que se cree la tarea.
 
+        Ajax.sendPostRequest(API_URL, task, MediaFormat.JSON, (value) => addTaskToList(JSON.parse(value)), (code) => showError(code, 'No se ha podido realizar el registro.'), true);
 
+        newTaskInput.value = "";
         return false;
     };
 
@@ -114,6 +116,14 @@
             // - Una forma de hacerlo es remover directamente el archivo con el id `task-${task.id}` del DOM HTML
             // y luego llamar a la función `addTaskToList` que re-creara la tarea con el nuevo estado en el lugar correcto.
             // - No te olvides de llamar al API (método PUT) para modificar el estado de la tarea en el servidor.
+
+            if (e.target.checked) {
+                document.getElementById(`task-${task.id}`).remove();
+                task.status = TASK_STATUS.DONE;
+                addTaskToList(task);
+                Ajax.sendPutRequest(API_URL + "/" + task.id, task, MediaFormat.JSON,
+                (value) => console.log(value),(code, value) => showError(code, 'Ha ocurrido un error al cambiar el estado'),true);
+            }
         };
     };
 
@@ -239,6 +249,7 @@
      */
     const removeTaskFromList = (id) => {
         // TODO ITEM 4: remover del DOM HTML el elemento con id `task-${id}`
+        document.getElementById(`task-${id}`).remove();
     };
 
     /**
@@ -253,5 +264,7 @@
         //   - Como parámetro `callbackError` enviar una función que llame al método `showError` enviando
         //     un mensaje de error
         //   - La llamada debe ser asíncrona.
+        Ajax.sendDeleteRequest(API_URL + '/'+id, null, MediaFormat.JSON,
+            (value) => removeTaskFromList(id),(code) => showError(code, 'No se ha podido eliminar la tarea.'),true);
     };
 })();
